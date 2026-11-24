@@ -1,0 +1,136 @@
+
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#081426">
+<title>ТРАНЗИТ ЭКСПЕРТ</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root{--bg:#081426;--panel:#101f35;--panel2:#142741;--gold:#d9b56d;--text:#f4f5f7;--muted:#91a0b5;--line:#263952}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-serif;padding-bottom:85px}
+header{padding:22px 18px 16px;background:linear-gradient(145deg,#142b49,#081426);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:13px}
+.logo{width:52px;height:58px;border:2px solid var(--gold);border-radius:15px 15px 20px 20px;display:grid;place-items:center;color:var(--gold);font-size:27px;background:#172b43}
+h1{font-size:19px;letter-spacing:1.5px;margin:0;color:var(--gold)}
+.sub{font-size:10px;letter-spacing:2px;color:var(--muted);margin-top:5px}
+.topline{display:flex;justify-content:space-between;align-items:center;margin-top:20px}
+.status{font-size:11px;color:#8ed6ac}
+select{background:#172b43;color:white;border:1px solid #43536a;border-radius:9px;padding:8px}
+main{padding:18px;max-width:650px;margin:auto}
+.welcome{font-size:23px;font-weight:bold;margin:7px 0}
+.desc{font-size:13px;color:var(--muted);line-height:1.6}
+.searchbox{margin-top:20px;background:var(--panel);border:1px solid #344861;border-radius:16px;padding:15px}
+.searchbox label{font-size:12px;color:var(--gold);display:block;margin-bottom:10px}
+input{width:100%;padding:15px;border-radius:10px;border:1px solid #344861;background:#081426;color:white;font-size:15px;outline:none}
+input:focus{border-color:var(--gold)}
+.primary{width:100%;padding:15px;margin-top:12px;background:linear-gradient(100deg,#b78b42,#e4c783);border:0;border-radius:10px;color:#101827;font-weight:bold;font-size:14px}
+.section-title{font-size:15px;margin:25px 0 12px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:15px;min-height:105px}
+.tile .ico{font-size:23px;margin-bottom:10px}
+.tile b{font-size:13px;display:block}
+.tile small{font-size:11px;color:var(--muted);display:block;margin-top:6px;line-height:1.4}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;margin-top:11px}
+.card b{font-size:13px}
+.card p{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:0}
+.notice{border-left:3px solid var(--gold);padding:11px 13px;background:#17263a;border-radius:7px;color:#c3ccda;font-size:11px;line-height:1.6;margin-top:18px}
+#result{display:none}
+.result-status{color:var(--gold);font-weight:bold;font-size:14px}
+nav{position:fixed;bottom:0;left:0;right:0;background:#0d1b2e;border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:10px 3px max(10px,env(safe-area-inset-bottom));z-index:5}
+nav button{border:0;background:none;color:var(--muted);font-size:10px;display:flex;flex-direction:column;align-items:center;gap:5px}
+nav button span{font-size:19px}
+nav button.active{color:var(--gold)}
+.page{display:none}
+.page.active{display:block}
+footer{text-align:center;color:#64748b;font-size:10px;padding:25px 10px}
+</style>
+</head>
+<body>
+<header>
+ <div class="brand">
+  <div class="logo">⚖</div>
+  <div><h1>ТРАНЗИТ ЭКСПЕРТ</h1><div class="sub">CUSTOMS & TRADE INTELLIGENCE</div></div>
+ </div>
+ <div class="topline">
+  <span class="status">● <span data-i="online">Эксперт тизими</span></span>
+  <select id="lang" onchange="setLang(this.value)">
+   <option value="uz">UZ</option><option value="ru">RU</option><option value="en">EN</option>
+  </select>
+ </div>
+</header>
+
+<main>
+ <section class="page active" id="home">
+  <div class="welcome" data-i="welcome">Юкларингизни ишонч билан текширинг</div>
+  <div class="desc" data-i="intro">Ўзбекистон ҳудудида транзит, импорт ва экспорт талабларини текшириш учун ягона ахборот платформаси.</div>
+  <div class="searchbox">
+   <label data-i="searchlabel">ТН ВЭД / ЮК НОМИ / CAS РАҚАМИ</label>
+   <input id="query" placeholder="Масалан: 29109000 ёки Benzyl alcohol">
+   <button class="primary" onclick="searchCargo()" data-i="searchbtn">⌕ ТЕКШИРИШ</button>
+  </div>
+  <div id="result" class="card">
+   <div class="result-status" data-i="demo">⚠ ДЕМО РЕЖИМ</div>
+   <p data-i="demotext">Ҳуқуқий маълумотлар базаси ҳали уланмаган. Бу натижа рухсат талаблари бўйича хулоса эмас.</p>
+  </div>
+  <div class="section-title" data-i="directions">Текширув йўналишлари</div>
+  <div class="grid">
+   <div class="tile"><div class="ico">🚛</div><b data-i="transit">Транзит</b><small data-i="transitdesc">Ўзбекистон орқали олиб ўтиш</small></div>
+   <div class="tile"><div class="ico">📦</div><b data-i="import">Импорт</b><small data-i="importdesc">Олиб кириш талаблари</small></div>
+   <div class="tile"><div class="ico">🌍</div><b data-i="export">Экспорт</b><small data-i="exportdesc">Олиб чиқиш талаблари</small></div>
+   <div class="tile"><div class="ico">🧪</div><b data-i="chem">Кимёвий моддалар</b><small data-i="chemdesc">CAS, таркиб ва назорат</small></div>
+  </div>
+  <div class="section-title" data-i="important">Муҳим маълумотлар</div>
+  <div class="card"><b>📚  Қонунчилик базаси</b><p data-i="lawdesc">Қарорлар, рўйхатлар, иловалар ва амалдаги талаблар бўйича маълумотлар.</p></div>
+  <div class="notice" data-i="warning">Эслатма: якуний хулоса расмий ҳуқуқий ҳужжатлар ва юкнинг аниқ таркиби асосида берилади. ТН ВЭД коди якка ўзи етарли бўлмаслиги мумкин.</div>
+ </section>
+
+ <section class="page" id="database">
+  <div class="welcome" data-i="database">Қонунчилик базаси</div>
+  <div class="desc" data-i="databaseintro">Расмий ҳужжатлар ва назорат рўйхатлари.</div>
+  <div class="card"><b>📘 Ўзбекистон Республикаси қонунчилиги</b><p data-i="official">Расмий манбалар улангандан кейин ҳужжатлар, бандлар ва амал қилиш санаси кўрсатилади.</p></div>
+  <div class="card"><b>🧪 Назорат қилинадиган моддалар</b><p data-i="controlled">Прекурсорлар, кучли таъсир қилувчи ва бошқа назоратдаги моддалар.</p></div>
+  <div class="card"><b>⚠ Хавфли юклар</b><p data-i="dangerous">ADR ва бошқа тегишли талабларни текшириш.</p></div>
+ </section>
+
+ <section class="page" id="history">
+  <div class="welcome" data-i="history">Қидирув тарихи</div>
+  <div class="desc" data-i="historyintro">Сўнгги қидирувларингиз шу ерда кўринади.</div>
+  <div id="historylist"></div>
+ </section>
+
+ <section class="page" id="settings">
+  <div class="welcome" data-i="settings">Созламалар</div>
+  <div class="card"><b data-i="language">Интерфейс тили</b><p data-i="languageintro">Ўзбек, рус ва инглиз тиллари.</p>
+   <select onchange="setLang(this.value)"><option value="uz">Ўзбекча</option><option value="ru">Русский</option><option value="en">English</option></select>
+  </div>
+  <div class="card"><b>ТРАНЗИТ ЭКСПЕРТ</b><p>Version 1.0 · Preview</p></div>
+ </section>
+ <footer>ТРАНЗИТ ЭКСПЕРТ © 2026</footer>
+</main>
+
+<nav>
+ <button class="active" onclick="go('home',this)"><span>⌂</span><i data-i="navhome">Бош саҳифа</i></button>
+ <button onclick="go('database',this)"><span>▤</span><i data-i="navbase">База</i></button>
+ <button onclick="go('history',this)"><span>◷</span><i data-i="navhistory">Тарих</i></button>
+ <button onclick="go('settings',this)"><span>⚙</span><i data-i="navsettings">Созлама</i></button>
+</nav>
+
+<script>
+const tg=window.Telegram?.WebApp;
+if(tg){tg.ready();tg.expand();}
+const words={
+uz:{online:"Эксперт тизими",welcome:"Юкларингизни ишонч билан текширинг",intro:"Ўзбекистон ҳудудида транзит, импорт ва экспорт талабларини текшириш учун ягона ахборот платформаси.",searchlabel:"ТН ВЭД / ЮК НОМИ / CAS РАҚАМИ",searchbtn:"⌕ ТЕКШИРИШ",demo:"⚠ ДЕМО РЕЖИМ",demotext:"Ҳуқуқий маълумотлар базаси ҳали уланмаган. Бу натижа рухсат талаблари бўйича хулоса эмас.",directions:"Текширув йўналишлари",transit:"Транзит",transitdesc:"Ўзбекистон орқали олиб ўтиш",import:"Импорт",importdesc:"Олиб кириш талаблари",export:"Экспорт",exportdesc:"Олиб чиқиш талаблари",chem:"Кимёвий моддалар",chemdesc:"CAS, таркиб ва назорат",important:"Муҳим маълумотлар",lawdesc:"Қарорлар, рўйхатлар, иловалар ва амалдаги талаблар бўйича маълумотлар.",warning:"Эслатма: якуний хулоса расмий ҳуқуқий ҳужжатлар ва юкнинг аниқ таркиби асосида берилади. ТН ВЭД коди якка ўзи етарли бўлмаслиги мумкин.",database:"Қонунчилик базаси",databaseintro:"Расмий ҳужжатлар ва назорат рўйхатлари.",official:"Расмий манбалар улангандан кейин ҳужжатлар, бандлар ва амал қилиш санаси кўрсатилади.",controlled:"Прекурсорлар, кучли таъсир қилувчи ва бошқа назоратдаги моддалар.",dangerous:"ADR ва бошқа тегишли талабларни текшириш.",history:"Қидирув тарихи",historyintro:"Сўнгги қидирувларингиз шу ерда кўринади.",settings:"Созламалар",language:"Интерфейс тили",languageintro:"Ўзбек, рус ва инглиз тиллари.",navhome:"Бош саҳифа",navbase:"База",navhistory:"Тарих",navsettings:"Созлама"},
+ru:{online:"Экспертная система",welcome:"Проверяйте грузы с уверенностью",intro:"Единая платформа для проверки требований транзита, импорта и экспорта в Узбекистане.",searchlabel:"ТН ВЭД / НАЗВАНИЕ ГРУЗА / CAS",searchbtn:"⌕ ПРОВЕРИТЬ",demo:"⚠ ДЕМО-РЕЖИМ",demotext:"Правовая база ещё не подключена. Этот результат не является заключением о разрешениях.",directions:"Направления проверки",transit:"Транзит",transitdesc:"Перевозка через Узбекистан",import:"Импорт",importdesc:"Требования к ввозу",export:"Экспорт",exportdesc:"Требования к вывозу",chem:"Химические вещества",chemdesc:"CAS, состав и контроль",important:"Важная информация",lawdesc:"Решения, списки, приложения и действующие требования.",warning:"Примечание: окончательное заключение основывается на официальных документах и точном составе груза. Одного кода ТН ВЭД может быть недостаточно.",database:"Правовая база",databaseintro:"Официальные документы и контрольные списки.",official:"После подключения источников будут показаны документы, пункты и даты действия.",controlled:"Прекурсоры, сильнодействующие и другие контролируемые вещества.",dangerous:"Проверка ADR и других применимых требований.",history:"История поиска",historyintro:"Здесь будут отображаться последние запросы.",settings:"Настройки",language:"Язык интерфейса",languageintro:"Узбекский, русский и английский языки.",navhome:"Главная",navbase:"База",navhistory:"История",navsettings:"Настройки"},
+en:{online:"Expert system",welcome:"Check your cargo with confidence",intro:"A unified platform for checking transit, import and export requirements in Uzbekistan.",searchlabel:"HS CODE / CARGO NAME / CAS",searchbtn:"⌕ CHECK",demo:"⚠ DEMO MODE",demotext:"The legal database is not connected yet. This result is not a permit determination.",directions:"Check categories",transit:"Transit",transitdesc:"Movement through Uzbekistan",import:"Import",importdesc:"Import requirements",export:"Export",exportdesc:"Export requirements",chem:"Chemicals",chemdesc:"CAS, composition and controls",important:"Important information",lawdesc:"Regulations, lists, annexes and current requirements.",warning:"Note: final conclusions require official legal sources and exact cargo composition. An HS code alone may not be sufficient.",database:"Legal database",databaseintro:"Official documents and control lists.",official:"Documents, clauses and effective dates will appear after official sources are connected.",controlled:"Precursors, potent and other controlled substances.",dangerous:"ADR and other applicable requirements.",history:"Search history",historyintro:"Your recent searches will appear here.",settings:"Settings",language:"Interface language",languageintro:"Uzbek, Russian and English.",navhome:"Home",navbase:"Database",navhistory:"History",navsettings:"Settings"}
+};
+function setLang(l){document.getElementById('lang').value=l;document.querySelectorAll('[data-i]').forEach(e=>{let k=e.dataset.i;if(words[l][k])e.textContent=words[l][k]});localStorage.setItem('te_lang',l)}
+function go(id,btn){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));btn.classList.add('active')}
+function searchCargo(){let q=document.getElementById('query').value.trim();if(!q)return;document.getElementById('result').style.display='block';let h=JSON.parse(localStorage.getItem('te_history')||'[]');h.unshift(q);localStorage.setItem('te_history',JSON.stringify([...new Set(h)].slice(0,15)));renderHistory()}
+function renderHistory(){let h=JSON.parse(localStorage.getItem('te_history')||'[]');document.getElementById('historylist').innerHTML=h.map(x=>'<div class="card">⌕ '+x+'</div>').join('')||'<p class="desc">—</p>'}
+setLang(localStorage.getItem('te_lang')||'uz');renderHistory();
+</script>
+</body>
+</html>
